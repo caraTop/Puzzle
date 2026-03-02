@@ -1,25 +1,28 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>My Website</title> <!-- Metadata, not visible on page -->
+    <meta charset="UTF-8">
+    <title>Puzzle Game</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <header> <!-- Main page header -->
-        <h1>Header</h1>
-        <nav> <!-- Navigation links -->
-            <ul>
-                <li><a href="/games">href test</a></li>
-            </ul>
-        </nav>
-    </header>
+<div class="container">
+    <!-- LEFT MENU -->
+    <div class="sidebar">
+        <h2>Clues</h2>
+        <ul id="clueList"></ul>
+    </div>
 
-    <article>
-        <header> <!-- Article specific header -->
-            <h2>H2 size</h2>
-            <p>Paragrahph size </p>
-        </header>
-    </article>
+    <!-- MAIN CONTENT -->
+    <div class="main">
+        <div id="puzzleText"></div>
 
+        <textarea id="answerInput" placeholder="Type your answer here..."></textarea>
+        <button id="submitAnswer">Submit</button>
+    </div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
