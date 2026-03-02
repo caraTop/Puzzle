@@ -37,6 +37,13 @@ function loadAnswer(index) {
    Rendering Sidebar
 ========================= */
 
+function allAnswered() {
+    for (let i = 0; i < unlockedCount; i++) {
+        if (!loadAnswer(i)) return false;
+    }
+    return true;
+}
+
 function renderClues() {
     clueList.innerHTML = "";
 
@@ -57,8 +64,8 @@ function renderClues() {
         clueList.appendChild(li);
     }
 
-    // Add Summary option when all unlocked
-    if (unlockedCount === puzzles.length) {
+    // Show Summary only if all unlocked clues have answers
+    if (allAnswered()) {
         const summaryItem = document.createElement("li");
         summaryItem.textContent = "Summary";
         summaryItem.classList.add("summary");
