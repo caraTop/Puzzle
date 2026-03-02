@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Raw JSON Viewer</title>
+</head>
+<body>
+<script>
+    // Replace 'data.json' with the name of your JSON file
+    fetch("./puzzles.json")
+        .then(response => {
+            if (!response.ok) throw new Error('Could not load JSON file');
+            return response.json();
+        })
+        .then(data => {
+            // Display JSON as raw text
+            document.body.textContent = JSON.stringify(data, null, 4);
+        })
+        .catch(error => {
+            document.body.textContent = 'Error: ' + error.message;
+        });
+</script>
+</body>
+</html>
