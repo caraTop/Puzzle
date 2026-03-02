@@ -1,5 +1,5 @@
 let puzzles = [];
-let unlockedCount = 1; // First puzzle unlocked by default
+let unlockedCount = 1; // First clue unlocked by default
 let currentPuzzleIndex = 0;
 
 const clueList = document.getElementById("clueList");
@@ -7,30 +7,35 @@ const puzzleText = document.getElementById("puzzleText");
 const submitButton = document.getElementById("submitAnswer");
 const answerInput = document.getElementById("answerInput");
 
-// Load saved progress
+/* =========================
+   Local Storage Handling
+========================= */
+
 function loadProgress() {
     const savedUnlocked = localStorage.getItem("unlockedCount");
     if (savedUnlocked !== null) {
-        unlockedCount = parseInt(savedUnlocked);
+        unlockedCount = Math.max(1, parseInt(savedUnlocked));
+    } else {
+        unlockedCount = 1;
     }
 }
 
-// Save progress
 function saveProgress() {
     localStorage.setItem("unlockedCount", unlockedCount);
 }
 
-// Save answer
 function saveAnswer(index, answer) {
     localStorage.setItem("answer_" + index, answer);
 }
 
-// Load answer
 function loadAnswer(index) {
     return localStorage.getItem("answer_" + index) || "";
 }
 
-// Render clue list
+/* =========================
+   Rendering
+========================= */
+
 function renderClues() {
     clueList.innerHTML = "";
 
@@ -38,39 +43,96 @@ function renderClues() {
         const li = document.createElement("li");
         li.textContent = puzzles[i].title;
         li.onclick = () => loadPuzzle(i);
+
+        if (i === currentPuzzleIndex) {
+            li.classList.add("active");
+        }
+
         clueList.appendChild(li);
     }
 }
 
-// Load puzzle
 function loadPuzzle(index) {
     currentPuzzleIndex = index;
     puzzleText.textContent = puzzles[index].text;
     answerInput.value = loadAnswer(index);
+
+    renderClues();
 }
 
-// Submit answer
+/* =========================
+   Summary Page
+========================= */
+
+function showSummaryPage() {
+    clueList.innerHTML = "";
+    answerInput.style.display = "none";
+    submitButton.style.display = "none";
+
+    let summaryText = "All clues completed:\n\n";
+
+    for (let i = 0; i < puzzles.length; i++) {
+        const ans = loadAnswer(i) || "(no answer)";
+        summaryText += puzzles[i].title + ": " + ans + "\n\n";
+    }
+
+    puzzleText.textContent = summaryText;
+}
+
+/* =========================
+   Submit Logic
+========================= */
+
 submitButton.addEventListener("click", () => {
     const answer = answerInput.value.trim();
     if (!answer) return;
 
     saveAnswer(currentPuzzleIndex, answer);
 
-    // Unlock next puzzle (without checking correctness)
-    if (currentPuzzleIndex === unlockedCount - 1 && unlockedCount < puzzles.length) {
+    // Unlock next clue if on latest unlocked
+    if (
+        currentPuzzleIndex === unlockedCount - 1 &&
+        unlockedCount < puzzles.length
+    ) {
         unlockedCount++;
         saveProgress();
+    }
+
+    // If all clues unlocked → show summary
+    if (unlockedCount === puzzles.length) {
+        showSummaryPage();
+    } else {
         renderClues();
     }
 });
 
-// Load JSON
-fetch("puzzles.json")
+/* =========================
+   Load JSON
+========================= */
+
+fetch("./puzzles.json")
     .then(response => response.json())
     .then(data => {
         puzzles = data.puzzles;
 
         loadProgress();
-        renderClues();
-        loadPuzzle(0);
+
+        if (unlockedCount === puzzles.length) {
+            showSummaryPage();
+        } else {
+            renderClues();
+            loadPuzzle(0);
+        }
+    })
+    .catch(error => {
+        console.error("Failed to load puzzles:", error);
     });
+
+/* =========================
+   Console Reset Command
+========================= */
+
+window.resetGame = function () {
+    localStorage.clear();
+    location.reload();
+};
