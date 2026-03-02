@@ -162,13 +162,23 @@ fetch("./puzzles.json")
     });
 
 /* =========================
-   Reset Console Command
+   Reset Commands
 ========================= */
 
-window.resetGame = function () {
+window.resetVersion = function () {
     // Remove all keys for this version
     Object.keys(localStorage).forEach(key => {
         if (key.endsWith("_v" + jsonVersion)) {
+            localStorage.removeItem(key);
+        }
+    });
+    location.reload();
+};
+
+window.resetGame = function () {
+    // Remove all versioned keys
+    Object.keys(localStorage).forEach(key => {
+        if (key.includes("_v")) {
             localStorage.removeItem(key);
         }
     });
