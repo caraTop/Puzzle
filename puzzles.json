@@ -1,0 +1,19 @@
+{
+  "puzzles": [
+    {
+      "id": 0,
+      "title": "Clue 1",
+      "text": "I speak without a mouth and hear without ears.\nI have nobody, but I come alive with wind.\nWhat am I?"
+    },
+    {
+      "id": 1,
+      "title": "Clue 2",
+      "text": "You measure my life in hours and I serve you by expiring.\nI'm quick when I'm thin and slow when I'm fat.\nWhat am I?"
+    },
+    {
+      "id": 2,
+      "title": "Clue 3",
+      "text": "I have cities, but no houses.\nI have rivers, but no water.\nWhat am I?"
+    }
+  ]
+}
