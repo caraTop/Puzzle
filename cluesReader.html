@@ -8,7 +8,7 @@
 <pre id="json-display"></pre>
 
 <script>
-    fetch('data.json')
+    fetch('./puzzles.json')
         .then(response => {
             if (!response.ok) throw new Error('Could not load JSON file');
             return response.json();

@@ -1,6 +1,5 @@
 let puzzles = [];
 let jsonVersion = "";
-let unlockedCount = 1;
 let currentView = "clue";
 let currentPuzzleIndex = 0;
 
@@ -17,19 +16,6 @@ function storageKey(key) {
     return `${key}_v${jsonVersion}`;
 }
 
-function loadProgress() {
-    const savedUnlocked = localStorage.getItem(storageKey("unlockedCount"));
-    if (savedUnlocked !== null) {
-        unlockedCount = Math.max(1, parseInt(savedUnlocked));
-    } else {
-        unlockedCount = 1;
-    }
-}
-
-function saveProgress() {
-    localStorage.setItem(storageKey("unlockedCount"), unlockedCount);
-}
-
 function saveAnswer(index, answer) {
     localStorage.setItem(storageKey("answer_" + index), answer);
 }
@@ -39,24 +25,14 @@ function loadAnswer(index) {
 }
 
 /* =========================
-   Check all unlocked answered
-========================= */
-
-function allAnswered() {
-    for (let i = 0; i < unlockedCount; i++) {
-        if (!loadAnswer(i)) return false;
-    }
-    return true;
-}
-
-/* =========================
    Render Sidebar
 ========================= */
 
 function renderClues() {
     clueList.innerHTML = "";
 
-    for (let i = 0; i < unlockedCount; i++) {
+    // Show ALL puzzles
+    for (let i = 0; i < puzzles.length; i++) {
         const li = document.createElement("li");
         li.textContent = puzzles[i].title;
 
@@ -72,23 +48,22 @@ function renderClues() {
         clueList.appendChild(li);
     }
 
-    if (allAnswered()) {
-        const summaryItem = document.createElement("li");
-        summaryItem.textContent = "Summary";
-        summaryItem.classList.add("summary");
+    // Summary ALWAYS visible
+    const summaryItem = document.createElement("li");
+    summaryItem.textContent = "Summary";
+    summaryItem.classList.add("summary");
 
-        if (currentView === "summary") {
-            summaryItem.classList.add("active");
-        }
-
-        summaryItem.onclick = () => {
-            currentView = "summary";
-            showSummary();
-            renderClues();
-        };
-
-        clueList.appendChild(summaryItem);
+    if (currentView === "summary") {
+        summaryItem.classList.add("active");
     }
+
+    summaryItem.onclick = () => {
+        currentView = "summary";
+        showSummary();
+        renderClues();
+    };
+
+    clueList.appendChild(summaryItem);
 }
 
 /* =========================
@@ -131,16 +106,6 @@ submitButton.addEventListener("click", () => {
     if (!answer) return;
 
     saveAnswer(currentPuzzleIndex, answer);
-
-    if (
-        currentPuzzleIndex === unlockedCount - 1 &&
-        unlockedCount < puzzles.length
-    ) {
-        unlockedCount++;
-        saveProgress();
-    }
-
-    renderClues();
 });
 
 /* =========================
@@ -153,7 +118,6 @@ fetch("./puzzles.json")
         puzzles = data.puzzles;
         jsonVersion = data.version || "1.0";
 
-        loadProgress();
         renderClues();
         loadPuzzle(0);
     })
@@ -166,7 +130,6 @@ fetch("./puzzles.json")
 ========================= */
 
 window.resetVersion = function () {
-    // Remove all keys for this version
     Object.keys(localStorage).forEach(key => {
         if (key.endsWith("_v" + jsonVersion)) {
             localStorage.removeItem(key);
@@ -176,7 +139,6 @@ window.resetVersion = function () {
 };
 
 window.resetGame = function () {
-    // Remove all versioned keys
     Object.keys(localStorage).forEach(key => {
         if (key.includes("_v")) {
             localStorage.removeItem(key);
